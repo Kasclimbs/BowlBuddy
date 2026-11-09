@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            fx:controller="edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.controller.PetProfileController"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="1200"
+            prefHeight="800"
+            style="-fx-background-color: #FAF5E9;">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <padding>
+                <Insets top="24" right="32" bottom="24" left="32"/>
+            </padding>
+
+            <Label text="BowlBuddy"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Open the edit form for the selected pet. -->
+            <Button text="Edit Pet"
+                    onAction="#handleEditPet"
+                    style="-fx-background-color: #337AB7; -fx-text-fill: white;"/>
+
+            <Button text="Back to My Pets"
+                    onAction="#handleBackToPets"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background-color: transparent;">
+            <content>
+                <VBox spacing="20"
+                      style="-fx-background-color: #FAF5E9;">
+                    <padding>
+                        <Insets top="20" right="48" bottom="40" left="48"/>
+                    </padding>
+
+                    <Label fx:id="petNameLabel"
+                           text="Pet Profile"
+                           style="-fx-font-size: 36px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+                    <GridPane hgap="32" vgap="16">
+
+                        <Label text="Animal Type"
+                               GridPane.rowIndex="0"/>
+                        <Label fx:id="animalTypeLabel"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="0"/>
+
+                        <Label text="Breed"
+                               GridPane.rowIndex="1"/>
+                        <Label fx:id="breedLabel"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="1"/>
+
+                        <Label text="Age"
+                               GridPane.rowIndex="2"/>
+                        <Label fx:id="ageLabel"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="2"/>
+
+                        <Label text="Weight"
+                               GridPane.rowIndex="3"/>
+                        <Label fx:id="weightLabel"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="3"/>
+
+                        <Label text="Daily Calorie Goal"
+                               GridPane.rowIndex="4"/>
+                        <Label fx:id="calorieGoalLabel"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="4"/>
+
+                        <Label text="Meals Per Day"
+                               GridPane.rowIndex="5"/>
+                        <Label fx:id="mealsPerDayLabel"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="5"/>
+
+                        <Label text="Medication"
+                               GridPane.rowIndex="6"/>
+                        <Label fx:id="medicationLabel"
+                               wrapText="true"
+                               maxWidth="650"
+                               GridPane.columnIndex="1"
+                               GridPane.rowIndex="6"/>
+
+                    </GridPane>
+
+                    <Separator/>
+
+                    <Label text="Notes"
+                           style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                    <Label fx:id="notesLabel"
+                           wrapText="true"/>
+
+                    <Label fx:id="messageLabel"
+                           wrapText="true"
+                           style="-fx-text-fill: #B42318;"/>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

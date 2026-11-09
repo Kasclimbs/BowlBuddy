@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            fx:controller="edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.controller.PetListController"
+            xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="1200"
+            prefHeight="800"
+            style="-fx-background-color: #FAF5E9;">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <padding>
+                <Insets top="24" right="32" bottom="24" left="32"/>
+            </padding>
+
+            <Label text="BowlBuddy"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Log Out"
+                    fx:id="logoutButton"
+                    onAction="#handleLogout"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="20" right="48" bottom="40" left="48"/>
+            </padding>
+
+            <Label fx:id="welcomeLabel"
+                   text="Welcome!"
+                   style="-fx-font-size: 20px; -fx-text-fill: #284D3B;"/>
+
+            <HBox alignment="CENTER_LEFT" spacing="16">
+                <Label text="My Pets"
+                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="+ Add Pet"
+                        onAction="#handleAddPet"
+                        style="-fx-background-color: #337AB7; -fx-text-fill: white; -fx-font-size: 16px;"/>
+            </HBox>
+
+            <ListView fx:id="petListView" VBox.vgrow="ALWAYS">
+                <placeholder>
+                    <Label text="Your pets will appear here."/>
+                </placeholder>
+            </ListView>
+
+            <Button text="View Selected Pet"
+                    onAction="#handleSelectPet"
+                    style="-fx-background-color: #337AB7; -fx-text-fill: white; -fx-font-size: 16px;"/>
+
+            <Label fx:id="messageLabel" wrapText="true"/>
+
+        </VBox>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.controller.LoginController"
+      alignment="CENTER"
+      spacing="16"
+      prefWidth="900"
+      prefHeight="600"
+      style="-fx-background-color: #FAF5E9;">
+
+    <Label text="BowlBuddy"
+           style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+    <Label text="Welcome back! Sign in to manage your pets."
+           style="-fx-font-size: 16px;"/>
+
+    <VBox spacing="12" maxWidth="320">
+
+        <Label text="Username"/>
+        <TextField fx:id="usernameField"
+                   promptText="Enter your username"/>
+
+        <Label text="Password"/>
+        <PasswordField fx:id="passwordField"
+                       promptText="Enter your password"/>
+
+        <Button text="Sign In"
+                maxWidth="Infinity"
+                onAction="#handleLogin"
+                style="-fx-background-color: #337AB7; -fx-text-fill: white; -fx-font-size: 16px;"/>
+
+
+        <Button text="Create Account"
+                maxWidth="Infinity"/>
+
+        <Label fx:id="messageLabel"
+               wrapText="true"
+               style="-fx-text-fill: #B42318;"/>
+
+    </VBox>
+
+</VBox>

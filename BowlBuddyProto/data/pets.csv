@@ -1,0 +1,10 @@
+PetId,UserId,Animal Type,Name,Breed,Age (yrs),Weight (kg),Daily Calorie Goal,Meals Per Day,Medication,Notes
+P001,U001,Dog,Buddy,Golden Retriever,4,30,1500,2,None,Loves chicken-based food
+P002,U001,Cat,Luna,Siamese,3,4.2,250,3,None,Prefers wet food
+P003,U002,Dog,alex,Labrador Retriever,5,32.0,1450,5,Joint supplement,On a weight-management diet plan
+P004,U003,Cat,Whiskers,Maine Coon,5,6.8,320,3,None,"Eats slowly, use a puzzle feeder"
+P005,U003,Rabbit,Clover,Holland Lop,2,1.8,120,2,None,Needs unlimited hay alongside meals
+P006,U004,Dog,Bella,French Bulldog,2,11,600,2,Allergy tablet (morning),"Sensitive stomach, avoid beef"
+P007,U005,Dog,Rocky,German Shepherd,8,36,1600,2,Joint supplement (daily),"Senior diet, smaller portions"
+P008,U005,Cat,Mittens,Domestic Shorthair,1,3.5,220,3,None,"Very active, kitten-to-adult food transition"
+P-4364fca6-f735-4a5c-b4f1-fa0acb0ceeb4,U003,Dog,rocky,Dalmation,4,70.0,1200,2,No,Needs to be eating a bit more

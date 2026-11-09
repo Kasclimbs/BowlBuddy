@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.controller.AddPetController"
+            prefWidth="1200" prefHeight="800"
+            style="-fx-background-color: #FAF5E9;">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <padding>
+                <Insets top="24" right="32" bottom="24" left="32"/>
+            </padding>
+
+            <Label text="BowlBuddy"
+                   style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background-color: transparent;">
+            <content>
+                <VBox spacing="16"
+                      style="-fx-background-color: #FAF5E9;">
+                    <padding>
+                        <Insets top="20" right="48" bottom="40" left="48"/>
+                    </padding>
+
+                    <Label text="Add Pet"
+                           style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+                    <VBox spacing="8" maxWidth="500">
+                        <Label text="Pet Name"/>
+                        <TextField fx:id="nameField"/>
+
+                        <Label text="Animal Type"/>
+                        <TextField fx:id="animalTypeField"
+                                   promptText="Dog, Cat, Rabbit..."/>
+
+                        <Label text="Breed"/>
+                        <TextField fx:id="breedField"/>
+
+                        <Label text="Age (years)"/>
+                        <TextField fx:id="ageField"/>
+
+                        <Label text="Weight (kg)"/>
+                        <TextField fx:id="weightField"/>
+
+                        <Label text="Daily Calorie Goal"/>
+                        <TextField fx:id="calorieGoalField"/>
+
+                        <Label text="Meals Per Day"/>
+                        <TextField fx:id="mealsPerDayField"/>
+
+                        <Label text="Medication (optional)"/>
+                        <TextField fx:id="medicationField"/>
+
+                        <Label text="Notes (optional)"/>
+                        <TextArea fx:id="notesField"
+                                  prefRowCount="3"
+                                  wrapText="true"/>
+
+                        <HBox spacing="12">
+                            <!-- Save the pet using AddPetController. -->
+                            <Button text="Save Pet"
+                                    onAction="#handleSavePet"
+                                    style="-fx-background-color: #337AB7; -fx-text-fill: white; -fx-font-size: 16px;"/>
+
+                            <!-- Return to the pet list without saving. -->
+                            <Button text="Cancel"
+                                    onAction="#handleCancel"/>
+                        </HBox>
+
+                        <Label fx:id="messageLabel"
+                               wrapText="true"
+                               style="-fx-text-fill: #B42318;"/>
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
