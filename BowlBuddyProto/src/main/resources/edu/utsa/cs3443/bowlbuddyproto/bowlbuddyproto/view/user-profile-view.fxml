@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextField?>
+
+<!-- Displays the signed-in user's account information. -->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.controller.UserProfileController"
+      spacing="24"
+      style="-fx-background-color: #FAF5E9;">
+
+    <padding>
+        <Insets top="32" right="48" bottom="32" left="48"/>
+    </padding>
+
+    <Label text="My Profile"
+           style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+    <!-- The controller fills these values from the current session. -->
+    <!-- The controller fills these fields with the current account details. -->
+    <GridPane hgap="24" vgap="16">
+        <Label text="First Name" GridPane.rowIndex="0"/>
+        <TextField fx:id="firstNameField" GridPane.columnIndex="1"
+                   GridPane.rowIndex="0"/>
+
+        <Label text="Last Name" GridPane.rowIndex="1"/>
+        <TextField fx:id="lastNameField" GridPane.columnIndex="1"
+                   GridPane.rowIndex="1"/>
+
+        <Label text="Email" GridPane.rowIndex="2"/>
+        <TextField fx:id="emailField" GridPane.columnIndex="1"
+                   GridPane.rowIndex="2"/>
+
+        <!-- Keep the sign-in username visible and read-only. -->
+        <Label text="Username" GridPane.rowIndex="3"/>
+        <Label fx:id="usernameLabel" GridPane.columnIndex="1"
+               GridPane.rowIndex="3"/>
+    </GridPane>
+
+    <!-- Save profile changes through UserProfileController. -->
+    <Button text="Save Changes"
+            onAction="#handleSaveProfile"
+            style="-fx-background-color: #337AB7; -fx-text-fill: white;"/>
+
+    <!-- Returns to the pet list in the same window. -->
+    <Button text="Back to My Pets" onAction="#handleBackToPets"/>
+
+    <Label fx:id="messageLabel" wrapText="true"
+           style="-fx-text-fill: #B42318;"/>
+</VBox>

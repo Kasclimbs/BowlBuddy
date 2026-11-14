@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!-- Browse recipes and view the details of the selected recipe. -->
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.controller.RecipeLibraryController"
+      spacing="20"
+      style="-fx-background-color: #FAF5E9;">
+
+    <padding>
+        <Insets top="32" right="48" bottom="32" left="48"/>
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="16">
+        <Label text="Recipe Library"
+               style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Back to My Pets" onAction="#handleBackToPets"/>
+    </HBox>
+
+    <HBox spacing="24" VBox.vgrow="ALWAYS">
+        <!-- DataManager supplies the recipes shown in this list. -->
+        <ListView fx:id="recipeListView" prefWidth="280">
+            <placeholder>
+                <Label text="No recipes to display."/>
+            </placeholder>
+        </ListView>
+
+        <!-- Selecting a recipe updates this panel. -->
+        <VBox spacing="12" HBox.hgrow="ALWAYS">
+            <Label fx:id="recipeNameLabel"
+                   text="Select a recipe"
+                   wrapText="true"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
+
+            <Label fx:id="recipeDetailsLabel" wrapText="true"/>
+
+            <Label text="Instructions" style="-fx-font-weight: bold;"/>
+            <TextArea fx:id="instructionsArea"
+                      editable="false"
+                      wrapText="true"
+                      VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </HBox>
+
+    <Label fx:id="messageLabel"
+           wrapText="true"
+           style="-fx-text-fill: #B42318;"/>
+</VBox>
