@@ -1,92 +1,52 @@
 # BowlBuddy
 
-BowlBuddy is a JavaFX desktop application that helps pet owners manage pet profiles and feeding information.
-
-Developed by **Team ByteMe** for **CS 3443 – Application Programming at UTSA**.
+BowlBuddy is a JavaFX desktop app for managing pet profiles and browsing feeding recipes. Team ByteMe built it for CS 3443 – Application Programming at UTSA.
 
 ## Current Features
 
-- Log in using accounts loaded from CSV.
-- Validate missing or incorrect login information.
-- Maintain the current user session and support logout.
-- Display pets belonging to the logged-in user.
-- View pet profiles, including feeding goals, medication, and notes.
-- Add pets and save them to CSV.
-- Edit pet information and persist changes.
-- Reload saved pet information after restarting the application.
+- Create an account, sign in, and log out. New passwords are stored as hashes.
+- View and edit your account name and email.
+- View, add, edit, and remove pets linked to your account. Removing a pet requires confirmation.
+- View each pet’s breed, age, weight, daily calorie goal, feeding frequency, medication, and notes.
+- Browse the Recipe Library to see brands, calories per 100 g, tags, and instructions.
+- Save account and pet changes locally so they’re available after restarting the app.
+
+## Run the App
+
+**Requirements:** JDK 21. The project uses Maven and JavaFX 21.0.6. The Maven wrapper is included.
+
+1. Clone the repository and open the `BowlBuddyProto` folder—the one containing `pom.xml`.
+2. In IntelliJ IDEA, import it as a Maven project and set the project SDK to JDK 21.
+3. Run `Launcher.java`. Set the run configuration’s working directory to `BowlBuddyProto` so the app can find the `data` folder.
+
+On Windows, you can also launch from PowerShell:
+
+```powershell
+cd BowlBuddyProto
+.\mvnw.cmd javafx:run
+```
+
+Run those commands from the repository root. From the sign-in screen, use a demo account or click **Create Account** to make a local test account.
+
+## Project Layout
+
+| Path | What it contains |
+|---|---|
+| `BowlBuddyProto/src/main/java` | Java models, controllers, `DataManager`, and the launcher |
+| `BowlBuddyProto/src/main/resources` | FXML views |
+| `BowlBuddyProto/data/users.csv` | Sample accounts and local account changes |
+| `BowlBuddyProto/data/pets.csv` | Pet profiles linked to their owners by user ID |
+| `BowlBuddyProto/data/recipes.csv` | Sample recipes used by the Recipe Library |
+
+BowlBuddy follows the Model–View–Controller pattern. `DataManager` handles CSV reads and writes. Each clone has its own local data; keep personal account information and local test registrations out of the public repository.
 
 ## Planned Features
 
-- Remove pets with confirmation.
-- Create accounts.
-- View and edit user profiles.
-- Browse and add recipes.
+- Add recipes to the library.
 - Log meals and portions.
-- Schedule feedings through a calendar.
-- Track calories against each pet's daily goal.
+- Schedule feedings on a calendar.
+- Track calories against each pet’s daily goal.
 
-## Technologies
+## Build Check
 
-- Java 21
-- JavaFX 21.0.6
-- Maven
-- FXML
-- CSV file storage
-- IntelliJ IDEA
-
-Dependencies are configured in `pom.xml`.
-
-## Running the Application
-
-1. Clone this repository.
-2. Open the project folder containing `pom.xml` in IntelliJ IDEA.
-3. Set the project SDK to **JDK 21**.
-4. Load or reload the Maven project to download dependencies.
-5. Confirm the project root contains:
-   - `data/users.csv`
-   - `data/pets.csv`
-6. Run `Launcher.java` in:
-   `edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto`
-
-Set the run configuration's **working directory** to the project root—the folder containing `pom.xml` and `data`.
-
-Use a sample account from `data/users.csv` to log in. New account registration is not implemented yet.
-
-## Project Organization
-
-- `model`: Application data classes, password utilities, and session state.
-- `controller`: Handles user actions, input validation, and screen navigation.
-- `data`: Contains `DataManager`, which handles CSV reading and writing.
-- `src/main/resources`: Contains FXML views.
-- Root-level `data`: Contains the application's CSV files.
-
-The application follows the **Model–View–Controller (MVC)** pattern. CSV file operations are handled by `DataManager`.
-
-## Data Files
-
-### users.csv
-
-Contains sample account information used for login.
-
-### pets.csv
-
-Contains pet information linked to owners through user IDs. Adding or editing a pet updates this file.
-
-Use sample data only. Do not commit real account credentials or personal information.
-
-## Known Limitations
-
-- Features listed under Planned Features are not implemented yet.
-- CSV files must have the expected headers and column order.
-- Pet text fields support commas and escaped quotation marks, but not embedded line breaks.
-- Sample accounts may use plaintext passwords in the source CSV; the loader hashes these in memory for verification.
-- Multiple application instances writing to the same CSV file are not supported.
-
-## Team Members
-
-- Brian Caloca
-- Add remaining team members here.
-
-## Development Status
-
-The current prototype supports login, pet browsing, pet profiles, and persistent pet creation and editing. Feeding management features are under development.
+The prototype update built successfully with `mvnw.cmd clean test` on Windows. Maven reported that there were no automated tests to run.
