@@ -115,4 +115,34 @@ public class PetListController {
             exception.printStackTrace();
         }
     }
+
+    /**
+     * Opens the signed-in user's profile in the current window.
+     */
+    @FXML
+    private void handleOpenUserProfile() {
+        try {
+            Parent profileView = FXMLLoader.load(
+                    HelloApplication.class.getResource("view/user-profile-view.fxml"));
+
+            petListView.getScene().setRoot(profileView);
+        } catch (IOException exception) {
+            messageLabel.setText("Unable to open your profile.");
+            exception.printStackTrace();
+        }
+    }
+
+    /** Opens the recipe library in the current window. */
+    @FXML
+    private void handleOpenRecipeLibrary() {
+        try {
+            Parent recipeView = FXMLLoader.load(
+                    HelloApplication.class.getResource("view/recipe-library-view.fxml"));
+
+            petListView.getScene().setRoot(recipeView);
+        } catch (IOException exception) {
+            messageLabel.setText("Unable to open the recipe library.");
+            exception.printStackTrace();
+        }
+    }
 }

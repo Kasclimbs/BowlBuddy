@@ -21,6 +21,11 @@
                    style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #284D3B;"/>
 
             <Region HBox.hgrow="ALWAYS"/>
+            <!-- Open the signed-in user's account details. -->
+            <!-- Open the recipe library from My Pets. -->
+            <Button text="Recipe Library" onAction="#handleOpenRecipeLibrary"/>
+
+            <Button text="My Profile" onAction="#handleOpenUserProfile"/>
 
             <Button text="Log Out"
                     fx:id="logoutButton"

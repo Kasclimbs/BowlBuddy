@@ -27,6 +27,11 @@
                     onAction="#handleEditPet"
                     style="-fx-background-color: #337AB7; -fx-text-fill: white;"/>
 
+            <!-- Confirm removal before deleting the selected pet's CSV record. -->
+            <Button text="Remove Pet"
+                    onAction="#handleRemovePet"
+                    style="-fx-background-color: #B42318; -fx-text-fill: white;"/>
+
             <Button text="Back to My Pets"
                     onAction="#handleBackToPets"/>
         </HBox>

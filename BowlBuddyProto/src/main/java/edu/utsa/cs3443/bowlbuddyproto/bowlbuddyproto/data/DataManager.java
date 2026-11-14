@@ -3,6 +3,7 @@ package edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.data;
 import edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.model.User;
 import edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.model.PasswordUtil;
 import edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.model.Pet;
+import edu.utsa.cs3443.bowlbuddyproto.bowlbuddyproto.model.Recipe;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -74,7 +75,8 @@ public class DataManager {
                         "Quoted CSV fields are not supported yet. Row " + (i + 1));
             }
 
-            String[] fields = line.split(",", -1);
+            // Parse quoted fields so names containing commas remain supported.
+            String[] fields = parseCsvLine(line);
 
             if (fields.length != 6) {
                 throw new IOException(
@@ -432,5 +434,363 @@ public class DataManager {
         }
     }
 
+
+    /**
+     * Removes a pet from the CSV file.
+     * Checks both the pet ID and owner ID before deleting the record.
+     *
+     * @param petId the ID of the pet to remove
+     * @param userId the ID of the pet's owner
+     * @throws IOException if the file is invalid or deletion fails
+     */
+    public void removePet(String petId, String userId) throws IOException {
+        Path petsFile = Path.of("data", "pets.csv");
+
+        List<String> lines = Files.readAllLines(
+                petsFile, StandardCharsets.UTF_8);
+
+        String expectedHeader =
+                "PetId,UserId,Animal Type,Name,Breed,Age (yrs),"
+                        + "Weight (kg),Daily Calorie Goal,Meals Per Day,"
+                        + "Medication,Notes";
+
+        if (lines.isEmpty()) {
+            throw new IOException("The pet CSV is empty.");
+        }
+
+        // Remove an optional byte order mark when checking the header.
+        String header = lines.get(0);
+        if (header.startsWith("\uFEFF")) {
+            header = header.substring(1);
+        }
+
+        if (!header.equals(expectedHeader)) {
+            throw new IOException("The pet CSV has an unexpected header.");
+        }
+
+        int matchingRow = -1;
+
+        // Validate all records before changing the file.
+        for (int i = 1; i < lines.size(); i++) {
+            if (lines.get(i).isBlank()) {
+                continue;
+            }
+
+            String[] fields = parseCsvLine(lines.get(i));
+
+            if (fields.length != 11) {
+                throw new IOException(
+                        "Invalid pet record at row " + (i + 1));
+            }
+
+            if (fields[0].trim().equals(petId)) {
+                // Prevent removing a pet belonging to a different owner.
+                if (!fields[1].trim().equals(userId)) {
+                    throw new IOException("The pet's owner does not match.");
+                }
+
+                if (matchingRow != -1) {
+                    throw new IOException("Duplicate pet ID in the CSV.");
+                }
+
+                matchingRow = i;
+            }
+        }
+
+        if (matchingRow == -1) {
+            throw new IOException("The selected pet could not be found.");
+        }
+
+        // Remove only the matching record, preserving all other pets.
+        lines.remove(matchingRow);
+
+        // Prepare the updated CSV before replacing the original file.
+        Path temporaryFile = Files.createTempFile(
+                petsFile.toAbsolutePath().getParent(), "pets-", ".tmp");
+
+        try {
+            Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
+
+            try {
+                // Replace the original file atomically when supported.
+                Files.move(
+                        temporaryFile,
+                        petsFile.toAbsolutePath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException exception) {
+                // Fall back to a regular replacement when necessary.
+                Files.move(
+                        temporaryFile,
+                        petsFile.toAbsolutePath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            // Clean up a temporary file left behind by a failed operation.
+            Files.deleteIfExists(temporaryFile);
+        }
+    }
+
+    /**
+     * Registers an account and saves all accounts using password hashes.
+     * Existing plaintext sample passwords are converted by loadUsers().
+     *
+     * @param firstName the user's first name
+     * @param lastName the user's last name
+     * @param email the user's email address
+     * @param username the requested username
+     * @param password the password to hash before storage
+     * @return the newly registered user
+     * @throws IOException if an account conflicts or saving fails
+     */
+    public User registerUser(
+            String firstName,
+            String lastName,
+            String email,
+            String username,
+            String password) throws IOException {
+
+        // Reload accounts so duplicate checks use the latest saved data.
+        // The loader converts plaintext sample passwords into hashes in memory.
+        loadUsers();
+
+        firstName = firstName.trim();
+        lastName = lastName.trim();
+        email = email.trim();
+        username = username.trim();
+
+        // Reject incomplete account information before changing the file.
+        if (firstName.isEmpty() || lastName.isEmpty()
+                || email.isEmpty() || username.isEmpty()) {
+            throw new IOException("Please complete every field.");
+        }
+
+        if (password == null || password.length() < 8) {
+            throw new IOException(
+                    "Your password must contain at least 8 characters.");
+        }
+
+        // Compare without case so capitalization cannot bypass duplicate checks.
+        for (User existingUser : users) {
+            if (existingUser.getUsername().equalsIgnoreCase(username)) {
+                throw new IOException("That username is already taken.");
+            }
+
+            if (existingUser.getEmail().equalsIgnoreCase(email)) {
+                throw new IOException("That email is already registered.");
+            }
+        }
+
+        // Generate an ID and hash the password before creating the account.
+        User newUser = new User(
+                "U-" + java.util.UUID.randomUUID(),
+                firstName,
+                lastName,
+                email,
+                username,
+                PasswordUtil.hashPassword(password));
+
+        List<User> updatedUsers = new ArrayList<>(users);
+        updatedUsers.add(newUser);
+
+        List<String> outputLines = new ArrayList<>();
+
+        // Every record now contains a hash, including existing sample accounts.
+        outputLines.add(
+                "UserId,First Name,Last Name,Email,Username,PasswordHash");
+
+        for (User account : updatedUsers) {
+            outputLines.add(String.join(",",
+                    csvField(account.getUserId()),
+                    csvField(account.getFirstName()),
+                    csvField(account.getLastName()),
+                    csvField(account.getEmail()),
+                    csvField(account.getUsername()),
+                    csvField(account.getPasswordHash())));
+        }
+
+        // Write the complete result before replacing the existing accounts file.
+        Path temporaryFile = Files.createTempFile(
+                usersFile.toAbsolutePath().getParent(), "users-", ".tmp");
+
+        try {
+            Files.write(
+                    temporaryFile, outputLines, StandardCharsets.UTF_8);
+
+            try {
+                Files.move(
+                        temporaryFile,
+                        usersFile.toAbsolutePath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException exception) {
+                // Use a regular replacement if atomic moves are unavailable.
+                Files.move(
+                        temporaryFile,
+                        usersFile.toAbsolutePath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            // Clean up a temporary file left behind if saving fails.
+            Files.deleteIfExists(temporaryFile);
+        }
+
+        // Update memory only after the accounts file has been saved.
+        users.clear();
+        users.addAll(updatedUsers);
+
+        return newUser;
+    }
+
+    /**
+     * Updates the name and email for an existing account.
+     *
+     * @param userId the ID of the account to update
+     * @param firstName the updated first name
+     * @param lastName the updated last name
+     * @param email the updated email address
+     * @return the saved account details
+     * @throws IOException if the account cannot be updated or saved
+     */
+    public User updateUserProfile(
+            String userId, String firstName, String lastName, String email)
+            throws IOException {
+
+        loadUsers();
+        List<User> updatedUsers = new ArrayList<>(users);
+        int accountIndex = -1;
+
+        // Find the account by ID and check whether another account uses the email.
+        for (int i = 0; i < updatedUsers.size(); i++) {
+            User account = updatedUsers.get(i);
+
+            if (account.getUserId().equals(userId)) {
+                if (accountIndex != -1) {
+                    throw new IOException("Duplicate user ID in the CSV.");
+                }
+                accountIndex = i;
+            } else if (account.getEmail().equalsIgnoreCase(email)) {
+                throw new IOException("That email is already registered.");
+            }
+        }
+
+        if (accountIndex == -1) {
+            throw new IOException("Your account could not be found.");
+        }
+
+        // Use the latest saved username and password hash.
+        User original = updatedUsers.get(accountIndex);
+        User updated = new User(
+                original.getUserId(), firstName, lastName, email,
+                original.getUsername(), original.getPasswordHash());
+        updatedUsers.set(accountIndex, updated);
+
+        List<String> outputLines = new ArrayList<>();
+        outputLines.add(
+                "UserId,First Name,Last Name,Email,Username,PasswordHash");
+
+        for (User account : updatedUsers) {
+            outputLines.add(String.join(",",
+                    csvField(account.getUserId()),
+                    csvField(account.getFirstName()),
+                    csvField(account.getLastName()),
+                    csvField(account.getEmail()),
+                    csvField(account.getUsername()),
+                    csvField(account.getPasswordHash())));
+        }
+
+        // Write the complete CSV before replacing the original.
+        Path target = usersFile.toAbsolutePath();
+        Path temporaryFile = Files.createTempFile(
+                target.getParent(), "users-", ".tmp");
+
+        try {
+            Files.write(temporaryFile, outputLines, StandardCharsets.UTF_8);
+
+            try {
+                Files.move(temporaryFile, target,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException exception) {
+                Files.move(temporaryFile, target,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temporaryFile);
+        }
+
+        // Refresh the in-memory list only after saving succeeds.
+        users.clear();
+        users.addAll(updatedUsers);
+        return updated;
+    }
+
+    /**
+     * Loads recipes from data/recipes.csv.
+     *
+     * @return the recipes in the order they appear in the file
+     * @throws IOException if the file cannot be read or contains an invalid record
+     */
+    public List<Recipe> loadRecipes() throws IOException {
+        Path recipesFile = Path.of("data", "recipes.csv");
+        List<String> lines = Files.readAllLines(
+                recipesFile, StandardCharsets.UTF_8);
+
+        String expectedHeader =
+                "Recipe ID,Recipe Name,Brand,Calories per 100g,Tag,Favorite,Instructions";
+
+        if (lines.isEmpty()
+                || !lines.get(0).replaceFirst("^\uFEFF", "").equals(expectedHeader)) {
+            throw new IOException("The recipe CSV has an unexpected header.");
+        }
+
+        List<Recipe> recipes = new ArrayList<>();
+
+        // Skip the header and reuse the parser for quoted instructions.
+        for (int i = 1; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.isBlank()) {
+                continue;
+            }
+
+            String[] fields = parseCsvLine(line);
+            if (fields.length != 7) {
+                throw new IOException(
+                        "Expected seven columns on recipe row " + (i + 1) + ".");
+            }
+
+            // The sample file stores favorites as Yes or No.
+            String favorite = fields[5].trim();
+            if (!favorite.equalsIgnoreCase("Yes")
+                    && !favorite.equalsIgnoreCase("No")) {
+                throw new IOException(
+                        "Expected Yes or No on recipe row " + (i + 1) + ".");
+            }
+
+            int calories;
+            try {
+                calories = Integer.parseInt(fields[3].trim());
+            } catch (NumberFormatException exception) {
+                throw new IOException(
+                        "Invalid calories on recipe row " + (i + 1) + ".", exception);
+            }
+
+            if (calories < 0) {
+                throw new IOException(
+                        "Calories cannot be negative on recipe row " + (i + 1) + ".");
+            }
+
+            recipes.add(new Recipe(
+                    fields[0].trim(),
+                    fields[1].trim(),
+                    fields[2].trim(),
+                    calories,
+                    fields[4].trim(),
+                    favorite.equalsIgnoreCase("Yes"),
+                    fields[6].trim()));
+        }
+
+        return recipes;
+    }
 
 }

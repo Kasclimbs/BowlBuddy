@@ -90,4 +90,26 @@ public class LoginController {
         messageLabel.setText("Invalid username or password.");
         passwordField.clear();
     }
+
+    /**
+     * Opens the registration form in the current window.
+     */
+    @FXML
+    private void handleOpenCreateAccount() {
+        try {
+            Parent createAccountView = FXMLLoader.load(
+                    HelloApplication.class.getResource(
+                            "view/create-account-view.fxml"));
+
+            // Clear the sign-in password before leaving the screen.
+            passwordField.clear();
+            usernameField.getScene().setRoot(createAccountView);
+        } catch (IOException exception) {
+            messageLabel.setStyle("-fx-text-fill: #B42318;");
+            messageLabel.setText("Unable to open the registration form.");
+            exception.printStackTrace();
+        }
+    }
+
+
 }

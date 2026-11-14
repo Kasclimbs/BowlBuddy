@@ -34,7 +34,9 @@
                 style="-fx-background-color: #337AB7; -fx-text-fill: white; -fx-font-size: 16px;"/>
 
 
+        <!-- Open the registration form from the sign-in screen. -->
         <Button text="Create Account"
+                onAction="#handleOpenCreateAccount"
                 maxWidth="Infinity"/>
 
         <Label fx:id="messageLabel"
