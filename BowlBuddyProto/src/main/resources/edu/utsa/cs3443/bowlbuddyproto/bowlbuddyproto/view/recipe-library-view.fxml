@@ -23,12 +23,31 @@
     </HBox>
 
     <HBox spacing="24" VBox.vgrow="ALWAYS">
-        <!-- DataManager supplies the recipes shown in this list. -->
-        <ListView fx:id="recipeListView" prefWidth="280">
-            <placeholder>
-                <Label text="No recipes to display."/>
-            </placeholder>
-        </ListView>
+        <VBox spacing="12" prefWidth="280">
+            <!-- DataManager supplies the recipes shown in this list. -->
+            <ListView fx:id="recipeListView" VBox.vgrow="ALWAYS">
+                <placeholder>
+                    <Label text="No recipes to display."/>
+                </placeholder>
+            </ListView>
+
+            <HBox spacing="8">
+                <!-- Open an empty recipe form. -->
+                <Button text="+ Add"
+                        onAction="#handleAddRecipe"
+                        style="-fx-background-color: #337AB7; -fx-text-fill: white;"/>
+
+                <!-- Open the form filled with the highlighted recipe. -->
+                <Button text="Edit"
+                        onAction="#handleEditRecipe"
+                        style="-fx-background-color: #337AB7; -fx-text-fill: white;"/>
+
+                <!-- Confirm before deleting the highlighted recipe's CSV record. -->
+                <Button text="Delete"
+                        onAction="#handleDeleteRecipe"
+                        style="-fx-background-color: #B42318; -fx-text-fill: white;"/>
+            </HBox>
+        </VBox>
 
         <!-- Selecting a recipe updates this panel. -->
         <VBox spacing="12" HBox.hgrow="ALWAYS">

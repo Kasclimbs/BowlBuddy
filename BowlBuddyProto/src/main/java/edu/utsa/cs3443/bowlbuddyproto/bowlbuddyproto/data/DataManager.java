@@ -793,4 +793,181 @@ public class DataManager {
         return recipes;
     }
 
+    /**
+     * Creates the next sequential recipe ID, such as R012.
+     *
+     * @return an ID one higher than the largest existing R-number
+     * @throws IOException if the recipe file is invalid
+     */
+    public String nextRecipeId() throws IOException {
+        List<String> lines = readRecipeLines();
+        int highestNumber = 0;
+
+        // Look only at IDs that follow the R### pattern used by the sample data.
+        for (int i = 1; i < lines.size(); i++) {
+            if (lines.get(i).isBlank()) {
+                continue;
+            }
+
+            String recipeId = parseCsvLine(lines.get(i))[0].trim();
+
+            if (recipeId.matches("R\\d+")) {
+                highestNumber = Math.max(
+                        highestNumber, Integer.parseInt(recipeId.substring(1)));
+            }
+        }
+
+        return String.format("R%03d", highestNumber + 1);
+    }
+
+    /**
+     * Adds a new recipe to the end of the recipe CSV.
+     *
+     * @param recipe the recipe to save
+     * @throws IOException if the file is invalid or the recipe cannot be saved
+     */
+    public void addRecipe(Recipe recipe) throws IOException {
+        List<String> lines = readRecipeLines();
+
+        // Prevent two recipes from sharing the same ID.
+        if (findRecipeRow(lines, recipe.getRecipeId()) != -1) {
+            throw new IOException("That recipe ID already exists.");
+        }
+
+        lines.add(recipeRow(recipe));
+        writeRecipeLines(lines);
+    }
+
+    /**
+     * Replaces an existing recipe's CSV record, keeping its ID unchanged.
+     *
+     * @param recipe the recipe containing the updated details
+     * @throws IOException if the file is invalid or cannot be updated
+     */
+    public void updateRecipe(Recipe recipe) throws IOException {
+        List<String> lines = readRecipeLines();
+        int matchingRow = findRecipeRow(lines, recipe.getRecipeId());
+
+        if (matchingRow == -1) {
+            throw new IOException("The selected recipe could not be found.");
+        }
+
+        lines.set(matchingRow, recipeRow(recipe));
+        writeRecipeLines(lines);
+    }
+
+    /**
+     * Removes a recipe from the recipe CSV.
+     *
+     * @param recipeId the ID of the recipe to remove
+     * @throws IOException if the file is invalid or deletion fails
+     */
+    public void removeRecipe(String recipeId) throws IOException {
+        List<String> lines = readRecipeLines();
+        int matchingRow = findRecipeRow(lines, recipeId);
+
+        if (matchingRow == -1) {
+            throw new IOException("The selected recipe could not be found.");
+        }
+
+        // Remove only the matching record, preserving all other recipes.
+        lines.remove(matchingRow);
+        writeRecipeLines(lines);
+    }
+
+    /**
+     * Reads the recipe CSV and checks its header and column counts
+     * before any record is changed.
+     */
+    private List<String> readRecipeLines() throws IOException {
+        Path recipesFile = Path.of("data", "recipes.csv");
+        List<String> lines = new ArrayList<>(Files.readAllLines(
+                recipesFile, StandardCharsets.UTF_8));
+
+        String expectedHeader =
+                "Recipe ID,Recipe Name,Brand,Calories per 100g,Tag,Favorite,Instructions";
+
+        if (lines.isEmpty()
+                || !lines.get(0).replaceFirst("^﻿", "").equals(expectedHeader)) {
+            throw new IOException("The recipe CSV has an unexpected header.");
+        }
+
+        for (int i = 1; i < lines.size(); i++) {
+            if (lines.get(i).isBlank()) {
+                continue;
+            }
+
+            if (parseCsvLine(lines.get(i)).length != 7) {
+                throw new IOException(
+                        "Invalid recipe record at row " + (i + 1));
+            }
+        }
+
+        return lines;
+    }
+
+    /**
+     * Finds the line index of a recipe ID, or -1 when it is not present.
+     */
+    private int findRecipeRow(List<String> lines, String recipeId)
+            throws IOException {
+        int matchingRow = -1;
+
+        for (int i = 1; i < lines.size(); i++) {
+            if (lines.get(i).isBlank()) {
+                continue;
+            }
+
+            if (parseCsvLine(lines.get(i))[0].trim().equals(recipeId)) {
+                if (matchingRow != -1) {
+                    throw new IOException("Duplicate recipe ID in the CSV.");
+                }
+
+                matchingRow = i;
+            }
+        }
+
+        return matchingRow;
+    }
+
+    /**
+     * Formats a recipe in the same column order as the CSV header.
+     */
+    private String recipeRow(Recipe recipe) throws IOException {
+        return String.join(",",
+                csvField(recipe.getRecipeId()),
+                csvField(recipe.getName()),
+                csvField(recipe.getBrand()),
+                Integer.toString(recipe.getCaloriesPer100g()),
+                csvField(recipe.getTag()),
+                recipe.isFavorite() ? "Yes" : "No",
+                csvField(recipe.getInstructions()));
+    }
+
+    /**
+     * Writes the recipe CSV to a temporary file before replacing the original.
+     */
+    private void writeRecipeLines(List<String> lines) throws IOException {
+        Path target = Path.of("data", "recipes.csv").toAbsolutePath();
+        Path temporaryFile = Files.createTempFile(
+                target.getParent(), "recipes-", ".tmp");
+
+        try {
+            Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
+
+            try {
+                Files.move(temporaryFile, target,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            } catch (java.nio.file.AtomicMoveNotSupportedException exception) {
+                // Use a regular replacement if atomic moves are unavailable.
+                Files.move(temporaryFile, target,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            // Clean up a temporary file left behind if saving fails.
+            Files.deleteIfExists(temporaryFile);
+        }
+    }
+
 }
