@@ -9,6 +9,7 @@ public final class SessionManager {
 
     private User currentUser;
     private Pet currentPet;
+    private Recipe currentRecipe;
 
 
     private SessionManager() {
@@ -34,8 +35,20 @@ public final class SessionManager {
         currentPet = pet;
     }
 
+    /**
+     * Returns the recipe being edited, or null when adding a new recipe.
+     */
+    public Recipe getCurrentRecipe() {
+        return currentRecipe;
+    }
+
+    public void setCurrentRecipe(Recipe recipe) {
+        currentRecipe = recipe;
+    }
+
     public void logout() {
         currentUser = null;
         currentPet = null;
+        currentRecipe = null;
     }
 }
